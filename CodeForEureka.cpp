@@ -1,0 +1,1 @@
+#include <cstdio> //Allows for C use in C++
