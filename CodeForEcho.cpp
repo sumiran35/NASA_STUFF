@@ -5,19 +5,20 @@
   11/22/23
 */
 
-#include <SPI.h>
+//#include <SPI.h>
 #include <MFRC522.h>
 #include <cstdio>
 #include <string>
 
 #define Echo
 #define Arduino
-//#define Real
+#define Real
 
 #ifdef (Arduino)
-#define Echo EchoArd
+  #define Echo EchoArd
 #elif (Real)
-#define Echo EchoReal
+  #define Echo EchoReal
+#endif
 
 #define RST_PIN1 11     // Define the RST pin on the RFID module
 #define SS_PIN1 12     // Define the SDA (SS) pin on the RFID module
