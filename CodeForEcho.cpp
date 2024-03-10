@@ -9,6 +9,7 @@
 #include <MFRC522.h>
 #include <cstdio>
 #include <string>
+#include "R200.cpp"
 
 #define Echo
 #define Arduino
@@ -59,12 +60,14 @@ void setup() {
     exit(EXIT_FAILURE);
   }
 
-  int grid[2][3][3]; //Define a matrix of 2 rows with 3 column each with 3 antennas
-  MFRC522* readers[6] = {reader1, reader2, reader3, reader4, reader5, reader6};
+ // int grid[2][3][3]; //Define a matrix of 2 rows with 3 column each with 3 antennas
+  int side[4][4];
+  int center[3];
+  R200* readers[9] = {reader1, reader2, reader3, reader4, reader5, reader6, reader7, reader8};
   int sum = 0;
-  int sumReader[6];
-  int row, column, element;
-  for (row; row < 2; ++row)
+  int sumReader[9];
+ // int row, column, element;
+ /* for (row; row < 2; ++row)
   {
     for (column; column < 3; ++column)
     {
@@ -75,27 +78,60 @@ void setup() {
     }
   }
   row, column, element = 0; //Set position back to 0
-}
+} */
+//loop 1 to check the antena in the centre
+  int side_antenna, center_antenna, dummy; //dummy used to signify the side of the square
+  //to avoid double scan we might be better off jumping from one to the other side instead of looping
+  //otherwise potential implementation of hash table might be required 
+  for(dummy, dummy< 4, dummy++)
+  {
+  for(side_antenna, side_antenna< 4, side_antenna++)
+  {
+  	side[dummy][side_antenna] = 0;
+  }
+  }
+
+  for(center_antenna, center_antenna < 3, center_antenna++)
+  {
+  	center[center_antenna] = 0;
+  }
 
 void loop() {
-  int readerNum = 0;
+  int readerNum_c = 0;
+  int readerNum_s = 0;
+  
   sum = 0;
 
-  if (NULL == readers[readerNum])
+  if (NULL == readers[readerNum_c])
   {
     isTagFound(); //Check if tag is found
     digitalWrite(7, LOW); //Powers Off Arduino
   }
 
-  if (isCardInRange(readers[readerNum])) //Check if card is in range for each reader
+  if (isCardInRange(readers[readerNum_c])) //Check if card is in range for each reader
+  //this needs to change to first look for the center and then the sides
   {
-    grid[row][column][element]++;
+    center[center_antenna]++;
   }
 
-  ++readerNum;
+    ++readerNum_c;
+
+    if (NULL == readers[readerNum_s])
+  {
+    isTagFound(); //Check if tag is found
+    digitalWrite(7, LOW); //Powers Off Arduino
+  }
+
+   if (isCardInRange(readers[readerNum_s])) //Check if card is in range for each reader
+  //this needs to change to first look for the center and then the sides
+  {
+    side[dummy][center_antenna]++;
+  }
+
+    ++readerNum_s;
 }
 
-int isCardInRange(MFRC522& reader) {
+int isCardInRange(R200& reader) {
   // Look for RFID tags
   if (reader.PICC_IsNewCardPresent() && reader.PICC_ReadCardSerial()) {
     reader.PICC_HaltA();
